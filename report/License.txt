@@ -1,0 +1,31 @@
+D3.V3.min,js
+Copyright (c) 2010-2014, Michael Bostock
+The 3-Clause BSD License
+https://opensource.org/licenses/BSD-3-Clause
+
+D3.pie.min.js
+Copyright (c) 2014-2015 Benjamin Keen
+The MIT License (MIT)
+
+D3plus.full.min.js
+Copyright (c) 2013 Alexander Simoes
+The MIT License (MIT)
+
+Bootstrap v3.3.7
+The MIT License (MIT)
+
+Jqurey v3.1.1
+Dual licensed under the MIT and GPL licenses
+pick either license
+
+Jqurey plug in v 1.4.1
+Dual licensed under the MIT and GPL licenses
+pick either license
+
+Jqurey.tablesorter v 2.0
+Copyright (c) 2007 Christian Bach
+Dual licensed under the MIT and GPL licenses:
+pick either license
+
+http://www.opensource.org/licenses/mit-license.php
+http://www.gnu.org/licenses/gpl.html

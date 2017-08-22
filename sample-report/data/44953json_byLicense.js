@@ -1,0 +1,1 @@
+var json_byLicense = [{"LicenseType":"Copyleft","Files":4728},{"LicenseType":"Copyleft Weak","Files":461},{"LicenseType":"Permissive","Files":6313},{"LicenseType":"Proprietary","Files":1276}]

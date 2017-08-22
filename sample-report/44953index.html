@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- copyright 2017, Rogue wave software
+developed by Chavirat Burapadecha -->
+    <title id="title">Open Source Audit Report</title>
+    <link rel="rogue wave icon" type="image/png" href="img/roguewave_favicon.png" />
+    <!-- getBootstamp CDN-->
+    <link href="css/bootstrap.min.css" rel="stylesheet"></link>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- jQuery + UI -->
+    <script src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.min.js"></script>
+</head>
+
+<body>
+    <div id="loading" class="row">
+        <img src="img/loading.gif" title="Loading ..." align="middle" />
+    </div>
+    <div id="report-content" style="display:none">
+        <div class="row table-header">
+            <div class="col-md-8">
+                <a href="javascript:window.location.reload(true)"><img src="img/rw-logo.png" style="height:60px;" /></a>
+            </div>
+            <div class="right-bottom" style="padding-right:40px">
+                <p>
+                    <b>Report Date:&nbsp;</b><span id="report_date"></span><br>
+                    <b>Project Name:&nbsp;</b><span id="project_name"></span></p>
+            </div>
+        </div>
+        <div id="tab-header" class="blue-tab">
+            <ul class="nav nav-pills">
+                <li id="summary_list"><a data-toggle="tab" href="#summary_tab">Summary</a></li>
+                <li id="bom_list"><a data-toggle="tab" href="#bom_tab">BOM</a></li>
+                <li id="licenses_list"><a data-toggle="tab" href="#licenses_tab">License Obligations</a></li>
+                <li id="cve_list"><a data-toggle="tab" href="#cve_tab">Vulnerabilities</a></li>
+                <li id="osar_download" style="float:right">
+                    <a href="data/44953OSAReport.xlsx" title="Export OSAReport.xlsx"><img src="img/download.png" style="height:25px" /></a>
+                </li>
+            </ul>
+        </div>
+        <div class="lightblue-tab"></div>
+        <div class="tab-content">
+            <div id="summary_tab" class="tab-pane fade in active">
+                <table style="width:100%">
+                    <tr>
+                        <td colspan=2>
+                            <h3>Open Source Audit Report (OSAR)</h3>
+                            <div id="introduction">
+                                This document is a summary of the open source software (OSS) scan assessment conducted on files provided by the client and scanned by OpenLogic scanner and analyzed by Rogue Wave Software Audit Services team. Results include a list of all open source
+                                packages and licenses identified with package provenance, as well as files identified as non open source (such as freeware, commercial, or in-house software). Also included are license obligations for common open source
+                                licenses with links to all license texts.
+                            </div>
+                            <br>
+                            <h3>Summary</h3>
+                            <div id="summary_info"></div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:50%">
+                            <h3>Files by software model</h3>
+                            <div id="softwaremodel_info1"></div>
+                        </td>
+                        <td>
+                            <div id="softwaremodel_chart" style="margin: 0 auto"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3>Files by license type</h3>
+                            <div id="bylicense_info1"></div>
+                        </td>
+                        <td>
+                            <div id="bylicense_chart" style="margin: 0 auto"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="bom_tab" class="tab-pane fade">
+                <div class="row" style="margin-left:0px;">
+                    <h3>Bill of Material
+                <span id="help_bom"></span>
+              </h3>
+                </div>
+                <table style="width:100%">
+                    <tr>
+                        <td style="width:45%; vertical-align: top;">
+                            <div id="softwaremodel_info2"></div>
+                        </td>
+                        <td style="width:5%"></td>
+                        <td style="width:45%; vertical-align: top;">
+                            <div id="bylicense_info2"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <div class="row">
+                                <label for="search_bom" style="margin-left:20px;">Package Name: </label>
+                                <input type="text" id="search_bom_package" onkeyup="search('search_bom_package','bomsort1',0)" placeholder="Search for package names.." title="Type in a package name">
+                                <label for="search_bom" style="margin-left:20px;">License Name: </label>
+                                <input type="text" id="search_bom_license" onkeyup="search('search_bom_license','bomsort1',3)" placeholder="Search for license names.." title="Type in a package name">
+
+                                <button type="button" class="btn btn-default btn-sm" id="clear_filter" onclick="clear_filter()" value="Clear Filter">Clear Filters</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <br>
+                            <div id="bom_info1"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="licenses_tab" class="tab-pane fade">
+                <table style="width:100%">
+                    <tr>
+                        <td style="float:left">
+                            <h3>Licenses and Obligations</h3>
+                        </td>
+                        <td style="float:right;padding:10px;">
+                            <button type="button" id="showAll" style="display:block" class="btn btn-primary" onclick="ShowDivs()" value="Show All">Show All</button>
+                            <button type="button" id="hideAll" style="display:none" class="btn btn-info" onclick="HideDivs()" value="Hide All">Hide All</button>
+                        </td>
+                    </tr>
+                </table>
+                <br>
+                <div id="obligations_info"></div>
+            </div>
+            <div id="cve_tab" class="tab-pane fade">
+                <div class="row" style="margin-left:0px;">
+                    <h3>Common Vulnerabilities and Exposures
+                <span id="help_cve"></span>
+                <span id="download_cve"><a href="data/44953CVEReport.xlsx" title="Export CVEReport.xlsx"><img src="img/download.png" /></a></span>
+              </h3>
+                </div>
+                <table style="width:100%">
+                    <tr>
+                        <td id="cve_left" style="float:left;display:none">
+                            <label for="search_cve_package">Package Name: </label>
+                            <input type="text" id="search_cve_package" onkeyup="search('search_cve_package','cve_info_by_date',0)" placeholder="Search for package names.." title="Type in a package name">
+                        </td>
+                        <td style="float:right;">
+                            <button type="button" id="switch_to_package" style="display:none" class="switch_view" onclick="show_package_view()">package view</button>
+                            <button type="button" id="switch_to_date" style="display:block" class="switch_view" onclick="show_date_view()">date view</button>
+                        </td>
+                    </tr>
+                </table>
+
+                <div id="cve_info_by_date" style="display:none"></div>
+                <div id="cve_info_by_package"></div>
+            </div>
+
+            <div id="modal_package"></div>
+            <div id="modal_license"></div>
+            <div id="default" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">Multiple Licenses </div>
+                        <div class="modal-body">See License Obligations tab for each license text</div>
+                        <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="legal_notices" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Legal Notices</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="disclaim1" class="disclaim">
+                            Rogue Wave Software, Inc. is not engaged in the rendering of legal advice. This report provides legal information, which should not be confused with legal advice. The OSS license information is not meant to provide a comprehensive legal analysis of a
+                            particular situation, but is meant to provide an informational starting point for the open source software user. Legal advice must be tailored to the specifics of each situation; the law differs from one jurisdiction to another
+                            and is subject to the interpretation of courts. You are strongly encouraged to consult with an attorney regarding specific issues, course of action, and interpretation.
+                        </div>
+                        <br>
+                        <div id="disclaim2" class="disclaim">
+                            CVE is a registered trademark of the MITRE Corporation and the authoritative source of CVE content is MITRE's CVE web site. Use of this information constitutes acceptance for use in an AS IS condition. There are NO warranties, implied or otherwise, with
+                            regard to this information or its use. Any use of this information is at the user's risk. It is the responsibility of user to evaluate the accuracy, completeness or usefulness of any information, opinion, advice or other content.
+                            ALL WARRANTIES OF ANY KIND ARE EXPRESSLY DISCLAIMED. Rogue Wave Software provides links to third-party sites while accepting no responsibility for reliableness therein, and will NOT BE LIABLE FOR ANY DIRECT, INDIRECT or any
+                            other kind of loss.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="file_info"></div>
+        <footer class="footer">
+            <p>&copy; 2017 Rogue Wave Software, Inc. All rights reserved.
+                <br>Rogue Wave is a registered trademark of Rogue Wave Software, Inc. Other product and service names may be trademarks of Rogue Wave Software, Inc. or its affiliates.
+                <br>Open Source Audit Report version 1.2.2</p>
+            <a href="#" data-toggle="modal" data-target="#legal_notices">Legal Notices</a>
+        </footer>
+        <script src="js/bootstrap.min.js"></script>
+        <!--d3 pie chart-->
+        <script type="text/javascript" src="js/d3pie.min.js"></script>
+        <script type="text/javascript" src="js/d3.v3.min.js"></script>
+        <!--sort table-->
+        <script type="text/javascript" src="js/jquery.tablesorter.js"></script>
+        <!--reply click-->
+        <script type="text/javascript" src="js/replyclick.js"></script>
+        <!-- data -->
+        <script type="text/javascript" src="data/44953json_summary.js"></script>
+        <script type="text/javascript" src="data/44953json_bom.js"></script>
+        <script type="text/javascript" src="data/44953json_softwaremodel.js"></script>
+        <script type="text/javascript" src="data/44953json_byLicense.js"></script>
+        <script type="text/javascript" src="data/44953json_licenseinfo.js"></script>
+        <script type="text/javascript" src="data/44953json_packageinfo.js"></script>
+        <script type="text/javascript" src="data/44953json_obligations.js"></script>
+        <script type="text/javascript" src="data/44953json_cve.js"></script>
+        <script type="text/javascript" src="data/44953json_files.js"></script>
+        <!-- json to table script -->
+        <script type="text/javascript" src="js/json-to-table.js"></script>
+        <script type="text/javascript" src="js/json-to-table2.js"></script>
+        <script type="text/javascript" src="js/json-to-table3.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                //loading trigger
+                var summary = json_summary;
+                var bom = json_bom;
+                var softwaremodel = json_softwaremodel;
+                var bylicense = json_byLicense;
+                var licenseinfo = json_licenseinfo;
+                var packageinfo = json_packageinfo;
+                var obligations = json_obligations;
+                //arrangement json_obligations to new_array_obligations
+                var new_array_obligations = [];
+                var new_object_obligations = {};
+                obligations.map(function(res) {
+                    if (!new_object_obligations[res.LicenseID]) {
+                        new_object_obligations = {}
+                        new_object_obligations[res.LicenseID] = {
+                            license: res.License,
+                            obligations: []
+                        }
+                        new_array_obligations.push(new_object_obligations)
+                    }
+                    var _obligation = {
+                        name: res.Name,
+                        description: res.Description,
+                        responsiblePackages: res.ResponsiblePackages,
+                        trigger: []
+                    }
+                    if (res.Trigger) {
+                        var _trigger = res.Trigger.split(',')
+                        for (i = 0; i < _trigger.length; i++) {
+                            _obligation.trigger.push(_trigger)
+                            _trigger = {}
+                        }
+                    }
+                    new_object_obligations[res.LicenseID].obligations.push(_obligation)
+                })
+                if (json_cve != "") {
+                    var cve = json_cve;
+                    //  arrangement json_cve to new_array_cve array
+                    var new_array_cve = [];
+                    var new_object_cve = {};
+                    cve.map(function(res) {
+                            if (!new_object_cve[res.PackageID]) {
+                                new_object_cve = {}
+                                new_object_cve[res.PackageID] = {
+                                    package: res.PackageName,
+                                    cve: []
+                                }
+                                new_array_cve.push(new_object_cve)
+                            }
+                            var _cve = {
+                                cve: res.CVE,
+                                cve_score: res.CVE_Score,
+                                access_complexity: res.AccessComplexity,
+                                updated_at: res.updated_at,
+                                nvd_link: res.nvd_link,
+                                created_at: res.created_at,
+                                summary: res.summary,
+                                access_vector: res.access_vector,
+                                integrity_impact: res.integrity_impact,
+                                versions: res.versions
+                            }
+                            new_object_cve[res.PackageID].cve.push(_cve)
+                        })
+                } else {
+                    $("#cve_list").hide();
+                }
+                if (json_files != "") {
+                    var files = json_files;
+                }
+                $("#loading").hide();
+                $("#report-content").show();
+
+                //summary information
+                var osar_number ="";
+                var project_number = summary[0]['Project Number'];
+                if (!project_number) {
+                    project_number = "";
+                    osar_number ="";
+                }else{
+                  osar_number = project_number.substr(4, 5);
+                  console.log(osar_number);
+                }
+
+                var project_name = summary[0]['Project Name'];
+                if (!project_name) {
+                    project_name = "";
+                }
+                var title1 = project_number + ' ' + project_name;
+                document.getElementById("title").innerHTML = title1;
+                document.getElementById("project_name").innerHTML = title1;
+                var ReportDate = summary[0].ReportDate;
+                document.getElementById("report_date").innerHTML = ReportDate;
+                var ReportIntro = summary[0].ReportIntro;
+                if (ReportIntro) {
+                    document.getElementById("introduction").innerHTML = ReportIntro;
+                }
+                var Disclaim1 = summary[0].Disclaim1;
+                if (Disclaim1) {
+                    document.getElementById("disclaim1").innerHTML = Disclaim1;
+                }
+                var Disclaim2 = summary[0].Disclaim2;
+                if (Disclaim2) {
+                    document.getElementById("disclaim2").innerHTML = Disclaim2;
+                }
+                var HelpBOM = Help(summary[0].HelpBOM);
+                document.getElementById("help_bom").innerHTML = HelpBOM;
+                var HelpCVE = Help(summary[0].HelpCVE);
+                document.getElementById("help_cve").innerHTML = HelpCVE;
+                //the number of row on the summary table
+                var rowNumber = 9;
+                var jsonHtmlTable_summary = ConvertJsonToTableSummary(summary, "summaryinfo", "table table-striped", rowNumber);
+                document.getElementById("summary_info").innerHTML = jsonHtmlTable_summary;
+                //bom information
+                var jsonHtmlTable_bom1 = ConvertJsonToTableBom(bom, "bomsort1", "table table-striped", osar_number);
+                document.getElementById("bom_info1").innerHTML = jsonHtmlTable_bom1;
+                //sort tables id bomsort1
+                $("#bomsort1").tablesorter({headers:{5:{sorter: false}}});
+
+                var jsonHtmlTable_obligations = ConvertJsonTonew_array_obligations(new_array_obligations);
+                document.getElementById("obligations_info").innerHTML = jsonHtmlTable_obligations;
+
+                var jsonHtmlTable_cve_by_date = ConvertJsonToTableCve(json_cve);
+                document.getElementById("cve_info_by_date").innerHTML = jsonHtmlTable_cve_by_date;
+                $("#cve_info1").tablesorter();
+                var jsonHtmlTable_cve_by_package = ConvertJsonTonew_array_cve(new_array_cve);
+                document.getElementById("cve_info_by_package").innerHTML = jsonHtmlTable_cve_by_package;
+
+                //modal for package information
+                var jsonHtmlModal_package = ConvertJsonToModalPackage(packageinfo);
+                document.getElementById("modal_package").innerHTML = jsonHtmlModal_package;
+                //modal for license information
+                var jsonHtmlModal_license = ConvertJsonToModalLicense(licenseinfo);
+                document.getElementById("modal_license").innerHTML = jsonHtmlModal_license;
+                //popover on notes, help
+                $('[data-toggle="popover"]').popover();
+                //software model table
+                var jsonHtmlTable_softwaremodel1 = ConvertJsonToTablesoftware(softwaremodel, "softwaremodelinfo1", "table table-striped");
+                var jsonHtmlTable_softwaremodel2 = ConvertJsonToTableOnclicksoftware(softwaremodel, "softwaremodelinfo2", "table table-striped");
+                document.getElementById("softwaremodel_info1").innerHTML = jsonHtmlTable_softwaremodel1;
+                document.getElementById("softwaremodel_info2").innerHTML = jsonHtmlTable_softwaremodel2;
+                //license type table
+                var jsonHtmlTable_bylicense1 = ConvertJsonToTablelicense(bylicense, "softwaremodelinfo1", "table table-striped");
+                var jsonHtmlTable_bylicense2 = ConvertJsonToTableOnclicklicense(bylicense, "bylicenseinfo2", "table table-striped");
+                document.getElementById("bylicense_info1").innerHTML = jsonHtmlTable_bylicense1;
+                document.getElementById("bylicense_info2").innerHTML = jsonHtmlTable_bylicense2;
+                //D3 pie charts
+                // Initialize empty array
+                var data_softwaremodel = [];
+                var data_bylicense = [];
+                //color of files by software model
+                var color_sf = ['#424094', '#D14524', '#5293AD', '#943235', '#F4A416', '#2D9F5F', '#5A3386']; // blue, orange,light blue, red,yellow, green, purple
+                //color of files by license
+                var color_bl = ['#943235', '#F4A416', '#2D9F5F', '#5A3386', '#424094', '#D14524', '#5293AD']; // red, yellow, green, purple,blue, orange,light blue
+                $.map(softwaremodel, function(obj, i) {
+                    return [
+                        [data_softwaremodel.push({
+                            label: obj.SoftwareModel,
+                            value: obj.Files,
+                            color: color_sf[i]
+                        })]
+                    ];
+                })
+                $.map(bylicense, function(obj, i) {
+                    return [
+                        [data_bylicense.push({
+                            label: obj.LicenseType,
+                            value: obj.Files,
+                            color: color_bl[i]
+                        })]
+                    ];
+                })
+
+                var pie = new d3pie("softwaremodel_chart", {
+                    "size": {
+                        "canvasHeight": 400,
+                        "canvasWidth": 590
+                    },
+
+                    "data": {
+                        "content": data_softwaremodel
+                    },
+                    "labels": {
+                        "outer": {
+                            "pieDistance": 32
+                        },
+                        "mainLabel": {
+                            "fontSize": 12
+                        },
+                        "percentage": {
+                            "color": "#ffffff",
+                            "fontSize": 11,
+                            "decimalPlaces": 0
+                        }
+                    },
+                    "tooltips": {
+                        "enabled": true,
+                        "type": "placeholder",
+                        "string": "{label}: {value}"
+                    }
+                });
+
+                var pie2 = new d3pie("bylicense_chart", {
+                    "size": {
+                        "canvasHeight": 400,
+                        "canvasWidth": 590
+                    },
+
+                    "data": {
+                        "content": data_bylicense
+                    },
+
+                    "labels": {
+                        "outer": {
+                            "pieDistance": 32
+                        },
+                        "mainLabel": {
+                            "fontSize": 12
+                        },
+                        "percentage": {
+                            "color": "#ffffff",
+                            "fontSize": 11,
+                            "decimalPlaces": 0
+                        }
+                    },
+                    "tooltips": {
+                        "enabled": true,
+                        "type": "placeholder",
+                        "string": "{label}: {value}"
+                    }
+                });
+            });
+        </script>
+
+</body>
+
+</html>

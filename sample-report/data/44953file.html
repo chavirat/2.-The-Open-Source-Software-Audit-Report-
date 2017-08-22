@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+
+<head>
+    <!-- copyright 2017, Rogue wave software
+developed by Chavirat Burapadecha -->
+    <title id="title">Open Source Audit Report</title>
+    <link rel="rogue wave icon" type="image/png" href="../img/roguewave_favicon.png" />
+    <!-- getBootstamp CDN-->
+    <link href="../css/bootstrap.min.css" rel="stylesheet"></link>
+    <link rel="stylesheet" href="../css/style.css">
+    <!-- jQuery + UI -->
+    <script src="../js/jquery.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-ui.min.js"></script>
+</head>
+
+<body>
+    <div id="loading" class="row">
+        <img src="../img/loading.gif" title="Loading ..." align="middle" />
+    </div>
+    <div id="report-content" style="display:none">
+        <div class="row table-header">
+            <div class="col-md-8">
+                <a href="javascript:window.location.reload(true)"><img src="../img/rw-logo.png" style="height:60px;" /></a>
+            </div>
+        </div>
+        <div id="tab-header" class="blue-tab" style="padding-top: 10px;padding-bottom: 10px;">
+            Files by Package
+        </div>
+        <div class="lightblue-tab"></div>
+        <div class="tab-content">
+            <div id="headers" class="row">
+                <div class="col-md-6">Package name:&nbsp;<b id="package_name"></b></div>
+                <div class="col-md-6">Count:&nbsp;<b id="file_num"></b>&nbsp;files</div>
+            </div>
+            <div id="viz" style="height:25px;"></div>
+            <br>
+            <div id="license_option" style="width:250px; display:inline-block"></div>
+            <input type="text" id="search_input" onkeyup="search('search_input','file_table',2)" placeholder="Search for path and filename.." />
+            <button type="button" class="btn btn-default btn-sm" id="clear_filter" value="Clear Filter">Clear Filters</button>
+            <div class="right-bottom">
+                <button type="button" class="btn btn-default btn-sm disabled" id="search_notice"
+                onclick="search_notice2('file_table',2)"
+                data-toggle="tooltip" data-html="true" data-placement="bottom"
+                title="Path and Files related to:<ul><li>License</li><li>Notice</li><li>Readme</li><li>Copying</li></ul>">
+                OSS Notices</button>
+            </div>
+
+            <div id="file_info"></div>
+        </div>
+    </div>
+    <!-- load D3plus with all dependencies -->
+    <script src="../js/d3plus.full.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <!--sort table-->
+    <script type="text/javascript" src="../js/jquery.tablesorter.js"></script>
+    <!--reply click-->
+    <script type="text/javascript" src="../js/replyclick.js"></script>
+    <!-- data -->
+    <script type="text/javascript" src="44953json_files.js"></script>
+    <!-- json to table script -->
+    <script type="text/javascript" src="../js/json-to-table.js"></script>
+    <script type="text/javascript" src="../js/json-to-file.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //loading trigger
+            $("#loading").hide();
+            $("#report-content").show();
+            if (json_files != "") {
+                var files = json_files;
+                var new_array_files = [];
+                var new_object_files = {};
+
+                files.map(function(res) {
+                    if (!new_object_files[res.PackageID]) {
+                        new_object_files = {}
+                        new_object_files[res.PackageID] = {
+                            package: res.Packages,
+                            files: []
+                        }
+                        new_array_files.push(new_object_files)
+                    }
+                    var _file = {
+                        path: res.Path,
+                        filename: res.Filename,
+                        license: res.Licenses,
+                        copyrights: res.Copyrights,
+                        notes: res.Notes,
+                        language: res.Language
+                    }
+                    new_object_files[res.PackageID].files.push(_file)
+                })
+            }
+
+            function getParameterByName(name, url) {
+                if (!url) {
+                    url = window.location.href;
+                }
+                name = name.replace(/[\[\]]/g, "\\$&");
+                var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, " "));
+            }
+            var package_id = getParameterByName("package_id");
+            // console.log(package_id);
+            document.getElementById("package_name").innerHTML = package_id;
+            var file_num = getParameterByName("file_num");
+            // console.log(file_num);
+            document.getElementById("file_num").innerHTML = file_num;
+            var ConvertJsonToTable_files = ConvertJsonToTableFiles(new_array_files, package_id, file_num);
+            document.getElementById("file_info").innerHTML = ConvertJsonToTable_files;
+            $('[data-toggle="popover"]').popover();
+            $("#file_table").tablesorter({headers:{0:{sorter: false},1:{sorter: false}}});
+            $('#clear_filter').click(function() {
+                document.getElementById("search_input").value = "";
+                var ConvertJsonToTable_files = ConvertJsonToTableFiles(new_array_files, package_id, file_num);
+                document.getElementById("file_info").innerHTML = ConvertJsonToTable_files;
+                $('[data-toggle="popover"]').popover();
+                $("#file_table").tablesorter({headers:{0:{sorter: false},1:{sorter: false}}});
+            });
+            $("#search_notice").tooltip();
+            document.getElementById('title').innerHTML = package_id;
+            var new_array_counts = CountArrayLang(new_array_files, package_id, file_num);
+            // instantiate d3plus
+            var visualization = d3plus.viz()
+                .container("#viz") // container DIV to hold the visualization
+                .data(new_array_counts) // data to use with the visualization
+                .type({
+                    "mode": "slice"
+                }) // visualization type
+                .id("name") // key for which our data is unique on
+                .size("value") // sizing of blocks
+                .font({
+                    "family": "sans-serif"
+                })
+                .draw(); // finally, draw the visualization!
+        });
+    </script>
+
+</body>
+
+</html>
