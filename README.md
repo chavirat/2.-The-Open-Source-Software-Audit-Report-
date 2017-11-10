@@ -1,3 +1,5 @@
+# The Open Source Software Audit Report 
+is a stand-alone web-based report written in HTML, CSS, jQuery, D3.js, Bootstrap and JavaScript. I exported the client’s data from our database and convert it to JSON format. After that, I wrote the required scripts to read JSON files and render to table and charts.
 ## Open Source Audit
 Reliable, fast OSS auditing by open source experts that assist you in understanding and managing open source compliance and security issues.
 ## HTML Report
